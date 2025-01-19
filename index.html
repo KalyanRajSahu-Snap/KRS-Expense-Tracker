@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h1>Expense Tracker</h1>
+            <div class="user-info">
+                <p>Welcome, <span id="username"></span>!</p>
+                <button id="logout-btn" class="btn btn-logout">Logout</button>
+            </div>
+            <div class="balance">
+                <h2>Your Balance</h2>
+                <h3 id="balance">$0.00</h3>
+            </div>
+            <div class="income-expense">
+                <div>
+                    <h4>Income</h4>
+                    <p id="money-plus" class="money plus">+$0.00</p>
+                </div>
+                <div>
+                    <h4>Expense</h4>
+                    <p id="money-minus" class="money minus">-$0.00</p>
+                </div>
+            </div>
+            <h3>Add new transaction</h3>
+            <form id="income-form" class="transaction-form">
+                <h4>Income</h4>
+                <div class="form-control">
+                    <label for="income-text">Description</label>
+                    <input type="text" id="income-text" placeholder="Enter description..." required>
+                </div>
+                <div class="form-control">
+                    <label for="income-amount">Amount</label>
+                    <input type="number" id="income-amount" placeholder="Enter amount..." required>
+                </div>
+                <div class="form-control">
+                    <label for="income-category">Category</label>
+                    <select id="income-category" required>
+                        <option value="">Select category...</option>
+                        <option value="Salary">Salary</option>
+                        <option value="Freelance">Freelance</option>
+                        <option value="Investment">Investment</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label for="income-date">Date</label>
+                    <input type="date" id="income-date" required>
+                </div>
+                <button class="btn btn-income">Add Income</button>
+            </form>
+            <form id="expense-form" class="transaction-form">
+                <h4>Expense</h4>
+                <div class="form-control">
+                    <label for="expense-text">Description</label>
+                    <input type="text" id="expense-text" placeholder="Enter description..." required>
+                </div>
+                <div class="form-control">
+                    <label for="expense-amount">Amount</label>
+                    <input type="number" id="expense-amount" placeholder="Enter amount..." required>
+                </div>
+                <div class="form-control">
+                    <label for="expense-category">Category</label>
+                    <select id="expense-category" required>
+                        <option value="">Select category...</option>
+                        <option value="Food">Food</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label for="expense-date">Date</label>
+                    <input type="date" id="expense-date" required>
+                </div>
+                <button class="btn btn-expense">Add Expense</button>
+            </form>
+        </div>
+        <div class="right-panel">
+            <h3>Transaction History</h3>
+            <div class="filter-container">
+                <h4>Filter Transactions</h4>
+                <div class="form-control">
+                    <label for="filter-date">Date</label>
+                    <input type="date" id="filter-date">
+                </div>
+                <div class="form-control">
+                    <label for="filter-category">Category</label>
+                    <select id="filter-category">
+                        <option value="">All Categories</option>
+                        <option value="Salary">Salary</option>
+                        <option value="Freelance">Freelance</option>
+                        <option value="Investment">Investment</option>
+                        <option value="Food">Food</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label for="filter-name">Name</label>
+                    <input type="text" id="filter-name" placeholder="Enter transaction name...">
+                </div>
+                <button id="apply-filter" class="btn btn-filter">Apply Filter</button>
+                <button id="clear-filter" class="btn btn-clear">Clear Filter</button>
+            </div>
+            <ul id="list" class="list"></ul>
+        </div>
+    </div>
+
+    <!-- Edit Transaction Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Transaction</h2>
+            <form id="edit-form">
+                <div class="form-control">
+                    <label for="edit-text">Description</label>
+                    <input type="text" id="edit-text" required>
+                </div>
+                <div class="form-control">
+                    <label for="edit-amount">Amount</label>
+                    <input type="number" id="edit-amount" required>
+                </div>
+                <div class="form-control">
+                    <label for="edit-category">Category</label>
+                    <select id="edit-category" required>
+                        <option value="">Select category...</option>
+                        <option value="Salary">Salary</option>
+                        <option value="Freelance">Freelance</option>
+                        <option value="Investment">Investment</option>
+                        <option value="Food">Food</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label for="edit-date">Date</label>
+                    <input type="date" id="edit-date" required>
+                </div>
+                <button type="submit" class="btn btn-update">Update Transaction</button>
+                <button type="button" class="btn btn-cancel" id="cancel-edit">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Download Transactions Button -->
+    <div class="download-container">
+        <button id="download-btn" class="btn btn-download">Download Transactions</button>
+    </div>
+    <!-- Download Options Modal -->
+    <div id="download-modal" class="modal">
+        <div class="modal-content">
+            <h2>Download Transactions</h2>
+            <form id="download-form">
+                <div class="form-control">
+                    <label for="download-type">File Type</label>
+                    <select id="download-type" required>
+                        <option value="pdf">PDF</option>
+                        <option value="excel">Excel</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label for="download-period">Period</label>
+                    <select id="download-period" required>
+                        <option value="day">Day</option>
+                        <option value="month">Month</option>
+                        <option value="year">Year</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label for="download-date">Date</label>
+                    <input type="date" id="download-date" required>
+                </div>
+                <button type="submit" class="btn btn-download">Download</button>
+                <button type="button" class="btn btn-cancel" id="cancel-download">Cancel</button>
+            </form>
+        </div>
+    </div>
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
